@@ -1,0 +1,62 @@
+name: Nightly leaderboard
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 1 * * *"
+
+concurrency:
+  group: nightly-leaderboard
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  evaluate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          enable-cache: true
+      - run: uv sync --frozen --dev
+      - name: Obtain evaluation data
+        env:
+          EVALUATION_DATA_URL: ${{ secrets.EVALUATION_DATA_URL }}
+          EVALUATION_DATA_SHA256: ${{ secrets.EVALUATION_DATA_SHA256 }}
+        run: |
+          mkdir -p artifacts
+          if [ -n "$EVALUATION_DATA_URL" ]; then
+            curl --fail --silent --show-error --location "$EVALUATION_DATA_URL" --output artifacts/public_test.csv
+            if [ -z "$EVALUATION_DATA_SHA256" ]; then
+              echo "EVALUATION_DATA_SHA256 must be configured with the private data URL" >&2
+              exit 1
+            fi
+            echo "$EVALUATION_DATA_SHA256  artifacts/public_test.csv" | sha256sum --check --strict
+          else
+            echo "Prototype mode: using the bundled public demo fixture. Configure secrets before launch."
+            cp tests/fixtures/demo_public_test.csv artifacts/public_test.csv
+          fi
+      - name: Calculate split-specific baseline
+        run: uv run --frozen python scripts/calculate_baseline_stats.py --data artifacts/public_test.csv --output artifacts/baseline_fertility.json
+      - name: Evaluate accepted submissions
+        run: >-
+          uv run --frozen python scripts/update_leaderboard.py
+          --data artifacts/public_test.csv
+          --baseline artifacts/baseline_fertility.json
+          --repeats 3
+          --strict
+      - name: Commit generated leaderboard
+        run: |
+          if git diff --quiet -- docs/data/leaderboard.json; then
+            echo "Leaderboard is unchanged."
+            exit 0
+          fi
+          git config user.name "amtc-leaderboard-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/data/leaderboard.json
+          git commit -m "chore: update nightly leaderboard"
+          git push

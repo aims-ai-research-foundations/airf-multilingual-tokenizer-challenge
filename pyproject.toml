@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "african-tokenizer-challenge"
+version = "1.0.0"
+description = "Evaluation toolkit for the African Multilingual Tokenizer Challenge"
+requires-python = ">=3.10"
+dependencies = [
+  "PyYAML==6.0.2",
+  "tokenizers==0.22.1",
+]
+
+[dependency-groups]
+data = [
+    "datasets>=4.0,<5",
+]
+dev = [
+  "ipykernel>=6.29.5,<8",
+  "matplotlib>=3.10.9",
+  "pytest==8.3.4",
+]
+
+[project.scripts]
+amtc-check = "competition.cli:check_main"
+amtc-evaluate = "competition.cli:evaluate_main"
+amtc-leaderboard = "competition.cli:leaderboard_main"
+
+[tool.setuptools.packages.find]
+include = ["competition*"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.uv]
+required-version = "0.9.0"

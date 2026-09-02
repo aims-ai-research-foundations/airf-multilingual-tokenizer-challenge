@@ -1,0 +1,21 @@
+{
+  "updated_at": "2026-09-01T23:44:11+00:00",
+  "entries": [
+    {
+      "team": "Official Baseline",
+      "slug": "baseline",
+      "score": 1.0,
+      "speed_chars_per_second": 3689076.411402052,
+      "vocab_size": 10000,
+      "status": "baseline",
+      "evaluated_at": "2026-09-01T23:44:11+00:00",
+      "en_normalized": 1.0,
+      "fr_normalized": 1.0,
+      "ha_normalized": 1.0,
+      "sw_normalized": 1.0,
+      "yo_normalized": 1.0,
+      "am_normalized": 1.0,
+      "rank": "—"
+    }
+  ]
+}

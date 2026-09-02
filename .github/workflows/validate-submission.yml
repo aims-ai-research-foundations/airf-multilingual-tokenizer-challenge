@@ -1,0 +1,31 @@
+name: Validate submission
+
+# Submissions are validated when a participant pushes the `submission` branch.
+# Everything the branch adds relative to `main` is treated as the submission.
+on:
+  push:
+    branches: [submission]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Fetch the base branch
+        run: git fetch --no-tags origin main:refs/remotes/origin/main
+      - name: Install uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          enable-cache: true
+      - run: uv sync --frozen --dev
+      - name: Validate changed team directory
+        run: uv run --frozen python scripts/validate_pr.py --base origin/main --head HEAD
+      - name: Run evaluator contract tests
+        run: uv run --frozen pytest

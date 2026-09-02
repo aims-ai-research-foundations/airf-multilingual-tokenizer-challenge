@@ -1,0 +1,56 @@
+name: Final private evaluation
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  final:
+    environment: private-evaluation
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          enable-cache: true
+      - run: uv sync --frozen --dev
+      - name: Download private test set
+        env:
+          PRIVATE_DATA_URL: ${{ secrets.PRIVATE_EVALUATION_DATA_URL }}
+          PRIVATE_DATA_SHA256: ${{ secrets.PRIVATE_EVALUATION_DATA_SHA256 }}
+        run: |
+          test -n "$PRIVATE_DATA_URL"
+          test -n "$PRIVATE_DATA_SHA256"
+          mkdir -p artifacts
+          curl --fail --silent --show-error --location "$PRIVATE_DATA_URL" --output artifacts/private_test.csv
+          echo "$PRIVATE_DATA_SHA256  artifacts/private_test.csv" | sha256sum --check --strict
+      - name: Calculate private baseline
+        run: uv run --frozen python scripts/calculate_baseline_stats.py --data artifacts/private_test.csv --output artifacts/private_baseline.json
+      - name: Evaluate selected final submissions
+        run: >-
+          uv run --frozen python scripts/update_leaderboard.py
+          --data artifacts/private_test.csv
+          --baseline artifacts/private_baseline.json
+          --csv artifacts/final_leaderboard.csv
+          --markdown artifacts/FINAL_LEADERBOARD.md
+          --site-json artifacts/final_leaderboard.json
+          --failures artifacts/final_failures.json
+          --final-only
+          --repeats 3
+          --strict
+      - name: Remove hidden evaluation text
+        if: always()
+        run: rm -f artifacts/private_test.csv artifacts/private_baseline.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: final-results
+          path: |
+            artifacts/final_leaderboard.csv
+            artifacts/FINAL_LEADERBOARD.md
+            artifacts/final_leaderboard.json
+            artifacts/final_failures.json
+          retention-days: 30

@@ -1,0 +1,29 @@
+# Environments and caches
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+build/
+*.egg-info/
+.DS_Store
+
+# Editor settings
+.vscode/
+
+# Generated evaluation artifacts
+artifacts/
+site-dist/
+/tokenizer.json
+/baseline_tokenizer.json
+.amtc_cache/
+/leaderboard.csv
+/LEADERBOARD.md
+
+# Organizer-only material, never published
+organizer-private/
+dataset_release/
+local_experiments/
+
+# Secrets, never commit
+.env
+.env.*

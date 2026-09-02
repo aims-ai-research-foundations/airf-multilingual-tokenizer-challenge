@@ -1,0 +1,29 @@
+{
+  "metric_version": "1.0",
+  "character_definition": "Unicode code points excluding whitespace",
+  "evaluation_data": "demo_public_test.csv",
+  "fertility": {
+    "en": 0.29457364341085274,
+    "fr": 0.2751677852348993,
+    "ha": 0.37410071942446044,
+    "sw": 0.352,
+    "yo": 0.5080645161290323,
+    "am": 0.6341463414634146
+  },
+  "token_counts": {
+    "en": 38,
+    "fr": 41,
+    "ha": 52,
+    "sw": 44,
+    "yo": 63,
+    "am": 52
+  },
+  "character_counts": {
+    "en": 129,
+    "fr": 149,
+    "ha": 139,
+    "sw": 125,
+    "yo": 124,
+    "am": 82
+  }
+}
