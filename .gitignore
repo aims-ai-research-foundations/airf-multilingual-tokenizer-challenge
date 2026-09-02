@@ -17,7 +17,6 @@ site-dist/
 /baseline_tokenizer.json
 .amtc_cache/
 /leaderboard.csv
-/LEADERBOARD.md
 
 # Organizer-only material, never published
 organizer-private/

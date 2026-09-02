@@ -1,8 +1,7 @@
-import json
 import shutil
 from pathlib import Path
 
-from competition.leaderboard import build_leaderboard, write_leaderboard, write_site_json
+from competition.leaderboard import build_leaderboard, write_leaderboard
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -50,9 +49,6 @@ def test_submission_to_all_leaderboard_formats(tmp_path):
 
     csv_path = tmp_path / "leaderboard.csv"
     markdown_path = tmp_path / "LEADERBOARD.md"
-    json_path = tmp_path / "docs/data/leaderboard.json"
     write_leaderboard(rows, csv_path, markdown_path)
-    write_site_json(rows, json_path)
     assert "Test Team" in csv_path.read_text(encoding="utf-8")
     assert "| 1 | Test Team | 1.0000 |" in markdown_path.read_text(encoding="utf-8")
-    assert json.loads(json_path.read_text(encoding="utf-8"))["entries"][0]["team"] == "Test Team"

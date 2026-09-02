@@ -16,6 +16,8 @@ The lower your score, the higher you climb on the leaderboard.
 
 **Start here:** [starter/starter.ipynb](starter/starter.ipynb)
 
+**Current standings:** [LEADERBOARD.md](LEADERBOARD.md), regenerated every night.
+
 ---
 
 ## Dataset

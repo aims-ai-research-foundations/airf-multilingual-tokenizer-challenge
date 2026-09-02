@@ -37,7 +37,6 @@ jobs:
           --baseline artifacts/private_baseline.json
           --csv artifacts/final_leaderboard.csv
           --markdown artifacts/FINAL_LEADERBOARD.md
-          --site-json artifacts/final_leaderboard.json
           --failures artifacts/final_failures.json
           --final-only
           --repeats 3
@@ -51,6 +50,5 @@ jobs:
           path: |
             artifacts/final_leaderboard.csv
             artifacts/FINAL_LEADERBOARD.md
-            artifacts/final_leaderboard.json
             artifacts/final_failures.json
           retention-days: 30

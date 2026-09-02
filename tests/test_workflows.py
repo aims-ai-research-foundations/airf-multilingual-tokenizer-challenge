@@ -11,7 +11,6 @@ def test_github_workflows_are_valid_yaml_documents():
     assert {path.name for path in workflows} == {
         "evaluate.yml",
         "final-evaluation.yml",
-        "pages.yml",
         "validate-submission.yml",
     }
     for path in workflows:

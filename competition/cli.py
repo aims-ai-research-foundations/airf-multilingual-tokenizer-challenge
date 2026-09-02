@@ -7,7 +7,7 @@ from pathlib import Path
 from .constants import MAX_VOCAB_SIZE, ROOT
 from .data import load_dataset
 from .evaluation import evaluate_submission
-from .leaderboard import build_leaderboard, write_leaderboard, write_site_json
+from .leaderboard import build_leaderboard, write_leaderboard
 from .metrics import benchmark
 from .validation import validate_tokenizer
 
@@ -79,7 +79,6 @@ def leaderboard_main(argv: list[str] | None = None) -> int:
     parser.add_argument("--baseline", default="tests/fixtures/baseline_fertility.json")
     parser.add_argument("--csv", default="leaderboard.csv")
     parser.add_argument("--markdown", default="LEADERBOARD.md")
-    parser.add_argument("--site-json", default="docs/data/leaderboard.json")
     parser.add_argument("--failures", default="artifacts/evaluation_failures.json")
     parser.add_argument("--repeats", type=int, default=3)
     parser.add_argument("--strict", action="store_true")
@@ -93,7 +92,6 @@ def leaderboard_main(argv: list[str] | None = None) -> int:
         final_only=args.final_only,
     )
     write_leaderboard(rows, args.csv, args.markdown)
-    write_site_json(rows, args.site_json)
     failures_path = Path(args.failures)
     failures_path.parent.mkdir(parents=True, exist_ok=True)
     failures_path.write_text(json.dumps(failures, indent=2) + "\n", encoding="utf-8")
