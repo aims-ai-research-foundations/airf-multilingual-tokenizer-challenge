@@ -1,25 +1,42 @@
-import shutil
 from pathlib import Path
+
+from tokenizers import Tokenizer, decoders, models, normalizers, pre_tokenizers, trainers
+
+from competition.data import load_dataset
 
 from competition.leaderboard import build_leaderboard, write_leaderboard
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def _fixture_tokenizer():
+    """Train a small byte level BPE on the bundled fixture data."""
+    texts = [item.text for item in load_dataset(ROOT / "tests/fixtures/train.csv")]
+    tokenizer = Tokenizer(models.BPE(unk_token="[UNK]", byte_fallback=True))
+    tokenizer.normalizer = normalizers.NFC()
+    tokenizer.pre_tokenizer = pre_tokenizers.ByteLevel(add_prefix_space=False, use_regex=True)
+    tokenizer.decoder = decoders.ByteLevel()
+    tokenizer.train_from_iterator(texts, trainer=trainers.BpeTrainer(
+        vocab_size=800, min_frequency=1, special_tokens=["[UNK]"],
+        initial_alphabet=pre_tokenizers.ByteLevel.alphabet(), show_progress=False,
+    ), length=len(texts))
+    return tokenizer
+
+
 def test_submission_to_all_leaderboard_formats(tmp_path):
     submissions = tmp_path / "submissions"
     baseline = submissions / "baseline"
     challenger = submissions / "test-team"
-    shutil.copytree(ROOT / "submissions/baseline", baseline)
-    shutil.copytree(ROOT / "submissions/baseline", challenger)
-    (challenger / "metadata.yml").write_text(
-        "team: Test Team\nmembers:\n  - Test Person\napproach: Contract fixture\n",
-        encoding="utf-8",
-    )
+    tokenizer = _fixture_tokenizer()
+    for directory, team in ((baseline, "Reference"), (challenger, "Test Team")):
+        directory.mkdir(parents=True)
+        tokenizer.save(str(directory / "tokenizer.json"))
+        (directory / "metadata.yml").write_text(
+            f"team: {team}\nmembers:\n  - Test Person\n", encoding="utf-8")
     draft = submissions / "broken-draft"
     draft.mkdir()
     (draft / "metadata.yml").write_text(
-        "team: Broken Draft\nmembers:\n  - Test Person\nfinal: false\n",
+        "team: Broken Draft\nmembers:\n  - Test Person\n",
         encoding="utf-8",
     )
     (draft / "tokenizer.json").write_text("not valid JSON", encoding="utf-8")
@@ -27,28 +44,15 @@ def test_submission_to_all_leaderboard_formats(tmp_path):
     rows, failures = build_leaderboard(
         submissions,
         ROOT / "tests/fixtures/demo_public_test.csv",
-        ROOT / "tests/fixtures/baseline_fertility.json",
         benchmark_repeats=1,
     )
     assert len(failures) == 1
     assert failures[0]["slug"] == "broken-draft"
-    assert [row["slug"] for row in rows] == ["test-team", "baseline"]
+    assert {row["slug"] for row in rows} == {"test-team", "baseline"}
     assert rows[0]["rank"] == 1
-    assert rows[0]["score"] == 1.0
-    assert rows[1]["rank"] == "—"
-
-    final_rows, final_failures = build_leaderboard(
-        submissions,
-        ROOT / "tests/fixtures/demo_public_test.csv",
-        ROOT / "tests/fixtures/baseline_fertility.json",
-        benchmark_repeats=1,
-        final_only=True,
-    )
-    assert not final_failures
-    assert [row["slug"] for row in final_rows] == ["baseline"]
 
     csv_path = tmp_path / "leaderboard.csv"
     markdown_path = tmp_path / "LEADERBOARD.md"
     write_leaderboard(rows, csv_path, markdown_path)
     assert "Test Team" in csv_path.read_text(encoding="utf-8")
-    assert "| 1 | Test Team | 1.0000 |" in markdown_path.read_text(encoding="utf-8")
+    assert "Test Team" in markdown_path.read_text(encoding="utf-8")

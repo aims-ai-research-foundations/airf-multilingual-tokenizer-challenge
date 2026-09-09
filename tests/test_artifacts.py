@@ -16,8 +16,13 @@ def test_starter_contains_only_participant_notebook():
     assert {path.name for path in (ROOT / "starter").glob("*.ipynb")} == {"starter.ipynb"}
 
 
-def test_generated_leaderboard_lists_the_baseline_last():
-    lines = (ROOT / "LEADERBOARD.md").read_text(encoding="utf-8").splitlines()
-    rows = [line for line in lines if line.startswith("| ") and "---" not in line]
-    assert rows, "LEADERBOARD.md must contain a table"
-    assert "(baseline)" in rows[-1]
+def test_reference_baselines_are_published_with_the_starter_kit():
+    baselines = ROOT / "starter/baselines"
+    assert {path.parent.name for path in baselines.glob("*/tokenizer.json")} == {
+        "word-level", "character-level"
+    }
+
+
+def test_generated_leaderboard_has_a_table_header():
+    text = (ROOT / "LEADERBOARD.md").read_text(encoding="utf-8")
+    assert "Score" in text and "Hausa" in text and "Amharic" in text

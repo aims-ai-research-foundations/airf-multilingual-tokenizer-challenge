@@ -1,4 +1,4 @@
-"""Submission profiler for the AI Research Foundations Multilingual
+"""Submission checker for the AI Research Foundations Multilingual
 Tokenization Challenge.
 
 This is the only helper file participants need. Download it next to your
@@ -8,17 +8,17 @@ notebook and run it on the ``tokenizer.json`` you are about to submit::
 
     profile_submission("tokenizer.json", data=validation)
 
-The profiler applies the same validity contract as official evaluation,
-reports normalized token fertility for every competition language, and
-benchmarks throughput. Everything it needs is fetched on demand, so the
-file works unchanged in Google Colab, on Kaggle, or in a local clone.
+It applies the same rules as official evaluation: the vocabulary limit, the
+coverage requirement, the lossless round trip, and the English and French
+guardrail. Everything is local, so the file works unchanged in Google Colab,
+on Kaggle, or in a clone of the competition repository.
 """
 
 from __future__ import annotations
 
+import json
 import statistics
 import time
-import urllib.request
 from collections import defaultdict
 from pathlib import Path
 
@@ -26,11 +26,6 @@ from tokenizers import Tokenizer
 from tokenizers import __version__ as installed_tokenizers_version
 
 __all__ = ["profile_submission"]
-
-GITHUB_REPO = "aims-ai-research-foundations/airf-multilingual-tokenizer-challenge"
-GITHUB_BRANCH = "main"
-BASELINE_PATH = "submissions/baseline/tokenizer.json"
-CACHE_DIR = Path(".amtc_cache")
 
 LANGUAGES = ("en", "fr", "ha", "sw", "yo", "am")
 LANGUAGE_NAMES = {
@@ -41,6 +36,10 @@ LANGUAGE_NAMES = {
     "yo": "Yoruba",
     "am": "Amharic",
 }
+SCORED_LANGUAGES = ("ha", "sw", "yo", "am")
+CONTEXT_LANGUAGES = ("en", "fr")
+CONTEXT_FERTILITY_RATIO = 1.15
+UNKNOWN_PENALTY = 100.0
 MAX_VOCAB_SIZE = 10_000
 MAX_TOKENIZER_BYTES = 20 * 1024 * 1024
 REQUIRED_TOKENIZERS_VERSION = "0.22.1"
@@ -54,42 +53,12 @@ SMOKE_TEXTS = {
 }
 
 
-def _baseline_url() -> str:
-    """Return the raw GitHub URL of the official baseline tokenizer."""
-    return (
-        f"https://raw.githubusercontent.com/{GITHUB_REPO}/"
-        f"{GITHUB_BRANCH}/{BASELINE_PATH}"
-    )
-
-
-def _official_baseline() -> Tokenizer:
-    """Load the official baseline tokenizer, downloading it if needed.
-
-    A local competition clone is used when one is available, so the
-    function costs nothing after the first call.
-    """
-    local = Path(BASELINE_PATH)
-    if local.is_file():
-        return Tokenizer.from_file(str(local))
-
-    cached = CACHE_DIR / "baseline_tokenizer.json"
-    if not cached.is_file():
-        cached.parent.mkdir(parents=True, exist_ok=True)
-        urllib.request.urlretrieve(_baseline_url(), cached)
-    return Tokenizer.from_file(str(cached))
-
-
 def _rows(data) -> list[tuple[str, str]]:
-    """Coerce supported data containers into ``(language, text)`` pairs.
-
-    Accepts a pandas DataFrame, a Hugging Face dataset, a sequence of
-    mappings, or a sequence of two-item pairs.
-    """
+    """Coerce supported containers into ``(language, text)`` pairs."""
     if hasattr(data, "itertuples"):
         return [(row.language, row.text) for row in data.itertuples()]
     if hasattr(data, "column_names"):
         return list(zip(data["language"], data["text"], strict=True))
-
     pairs: list[tuple[str, str]] = []
     for item in data:
         if isinstance(item, dict):
@@ -102,35 +71,55 @@ def _rows(data) -> list[tuple[str, str]]:
     return pairs
 
 
-def _count_characters(text: str) -> int:
-    """Count Unicode code points, excluding every whitespace character."""
-    return sum(1 for character in text if not character.isspace())
+def _unknown_token_id(tokenizer: Tokenizer) -> int | None:
+    """Return the id the tokenizer emits for text it cannot represent."""
+    model = json.loads(tokenizer.to_str()).get("model", {})
+    name = model.get("unk_token")
+    if isinstance(name, str):
+        return tokenizer.token_to_id(name)
+    unk_id = model.get("unk_id")
+    return int(unk_id) if unk_id is not None else None
 
 
-def _fertility(tokenizer: Tokenizer, rows: list[tuple[str, str]]) -> dict:
-    """Return tokens per non-whitespace character for each language."""
+def _measure(
+    tokenizer: Tokenizer, rows: list[tuple[str, str]]
+) -> tuple[dict, dict, int]:
+    """Return fertility and unknown rate by language, plus lossy row count."""
     tokens: defaultdict = defaultdict(int)
-    characters: defaultdict = defaultdict(int)
+    words: defaultdict = defaultdict(int)
+    unknowns: defaultdict = defaultdict(int)
+    unknown_id = _unknown_token_id(tokenizer)
+    lossy = 0
+
     texts = [text for _, text in rows]
     encodings = tokenizer.encode_batch(texts, add_special_tokens=False)
     for (language, text), encoding in zip(rows, encodings, strict=True):
         tokens[language] += len(encoding.ids)
-        characters[language] += _count_characters(text)
-    return {
-        language: tokens[language] / characters[language]
+        words[language] += len(text.split())
+        if unknown_id is not None:
+            unknowns[language] += sum(
+                1 for value in encoding.ids if value == unknown_id
+            )
+        if tokenizer.decode(encoding.ids, skip_special_tokens=False) != text:
+            lossy += 1
+
+    fertility = {
+        language: tokens[language] / words[language]
         for language in LANGUAGES
-        if characters[language]
+        if words[language]
     }
+    unknown_rate = {
+        language: unknowns[language] / words[language]
+        for language in LANGUAGES
+        if words[language]
+    }
+    return fertility, unknown_rate, lossy
 
 
-def _benchmark(
-    tokenizer: Tokenizer,
-    rows: list[tuple[str, str]],
-    repeats: int = 3,
-) -> tuple[float, float]:
+def _benchmark(tokenizer: Tokenizer, rows, repeats: int = 3) -> tuple[float, float]:
     """Return characters per second and the median elapsed seconds."""
     texts = [text for _, text in rows]
-    total_characters = sum(len(text) for text in texts)
+    total = sum(len(text) for text in texts)
     tokenizer.encode_batch(texts, add_special_tokens=False)
     timings = []
     for _ in range(max(1, repeats)):
@@ -138,11 +127,11 @@ def _benchmark(
         tokenizer.encode_batch(texts, add_special_tokens=False)
         timings.append(time.perf_counter() - started)
     elapsed = statistics.median(timings)
-    return total_characters / max(elapsed, 1e-12), elapsed
+    return total / max(elapsed, 1e-12), elapsed
 
 
 def _validate(path: Path) -> tuple[Tokenizer | None, dict, list[str], int | None]:
-    """Apply the official validity contract to one tokenizer file."""
+    """Apply the file-level validity contract to one tokenizer."""
     checks: dict[str, bool] = {}
     errors: list[str] = []
 
@@ -169,28 +158,15 @@ def _validate(path: Path) -> tuple[Tokenizer | None, dict, list[str], int | None
     checks["vocabulary"] = vocab_size <= MAX_VOCAB_SIZE
     if not checks["vocabulary"]:
         errors.append(
-            f"vocabulary has {vocab_size:,} entries; the limit is "
-            f"{MAX_VOCAB_SIZE:,}"
+            f"vocabulary has {vocab_size:,} entries; "
+            f"the limit is {MAX_VOCAB_SIZE:,}"
         )
 
-    try:
-        encodings = tokenizer.encode_batch(
-            list(SMOKE_TEXTS.values()), add_special_tokens=False
-        )
-        checks["encoding"] = all(encoding.ids for encoding in encodings)
-        if not checks["encoding"]:
-            errors.append("at least one language produced no tokens")
-        decoded = [
-            tokenizer.decode(encoding.ids, skip_special_tokens=False)
-            for encoding in encodings
-        ]
-        checks["decoding"] = all(text.strip() for text in decoded)
-        if not checks["decoding"]:
-            errors.append("at least one smoke text could not be decoded")
-    except Exception as error:
-        checks["encoding"] = False
-        checks["decoding"] = False
-        errors.append(f"encode or decode failed: {error}")
+    smoke = list(SMOKE_TEXTS.items())
+    fertility, _, _ = _measure(tokenizer, smoke)
+    checks["encoding"] = len(fertility) == len(LANGUAGES)
+    if not checks["encoding"]:
+        errors.append("at least one language produced no tokens")
 
     checks["compatibility"] = (
         installed_tokenizers_version == REQUIRED_TOKENIZERS_VERSION
@@ -215,28 +191,25 @@ def profile_submission(
     repeats: int = 3,
     verbose: bool = True,
 ) -> dict:
-    """Validate, score and benchmark a tokenizer before you submit it.
+    """Check, score and benchmark a tokenizer before you submit it.
 
     Args:
-        path: Location of the ``tokenizer.json`` file to profile.
-        data: Optional labelled text used for the competition score and
-            the throughput benchmark. Any container of ``language`` and
-            ``text`` pairs works, including a pandas DataFrame and a
-            Hugging Face dataset. Validation data is the usual choice.
+        path: Location of the ``tokenizer.json`` file to check.
+        data: Optional labelled text used for the score, the coverage check and
+            the benchmark. Any container of ``language`` and ``text`` pairs
+            works. The validation split is the usual choice.
         repeats: Number of timed encoding passes; the median is reported.
         verbose: Print the human readable report as well as returning it.
 
     Returns:
-        A dictionary with the validity checks, any errors, the
-        vocabulary size and, when ``data`` is supplied, per language
-        fertility, normalized fertility, the competition score and
-        throughput.
+        A dictionary with the checks, any errors, the vocabulary size and,
+        when ``data`` is supplied, per language fertility, the competition
+        score, unknown token count and throughput.
     """
     path = Path(path)
     tokenizer, checks, errors, vocab_size = _validate(path)
     report = {
         "path": str(path),
-        "valid": bool(tokenizer) and all(checks.values()) and not errors,
         "checks": checks,
         "errors": errors,
         "vocab_size": vocab_size,
@@ -245,32 +218,38 @@ def profile_submission(
 
     if tokenizer is not None and data is not None:
         rows = _rows(data)
-        fertility = _fertility(tokenizer, rows)
-        baseline = _fertility(_official_baseline(), rows)
-        normalized = {
-            language: fertility[language] / baseline[language]
-            for language in fertility
+        fertility, unknown_rate, lossy = _measure(tokenizer, rows)
+        penalised = {
+            language: value + UNKNOWN_PENALTY * unknown_rate.get(language, 0.0)
+            for language, value in fertility.items()
         }
+        score = sum(penalised[l] for l in SCORED_LANGUAGES) / len(SCORED_LANGUAGES)
+        raw = sum(fertility[l] for l in SCORED_LANGUAGES) / len(SCORED_LANGUAGES)
+        budget = raw * CONTEXT_FERTILITY_RATIO
+        breaches = [l for l in CONTEXT_LANGUAGES if fertility.get(l, 0.0) > budget]
         throughput, elapsed = _benchmark(tokenizer, rows, repeats=repeats)
-        report.update(
-            {
-                "fertility": fertility,
-                "baseline_fertility": baseline,
-                "normalized": normalized,
-                "score": sum(normalized.values()) / len(normalized),
-                "throughput": throughput,
-                "elapsed_seconds": elapsed,
-                "rows": len(rows),
-            }
-        )
 
+        checks["guardrail"] = not breaches
+        for language in breaches:
+            errors.append(
+                f"{LANGUAGE_NAMES[language]} fertility {fertility[language]:.3f} "
+                f"exceeds the guardrail of {budget:.3f}"
+            )
+        report.update({
+            "score": score, "fertility": fertility, "unknown_rate": unknown_rate,
+            "penalised": penalised, "lossy_rows": lossy,
+            "guardrail_breaches": breaches, "throughput": throughput,
+            "elapsed_seconds": elapsed, "rows": len(rows),
+        })
+
+    report["valid"] = bool(tokenizer) and all(checks.values()) and not errors
     if verbose:
         _print_report(report)
     return report
 
 
 def _print_report(report: dict) -> None:
-    """Print a submission profile in the official checker layout."""
+    """Print a submission report in the official checker layout."""
     print("AI Research Foundations Multilingual Tokenization Challenge")
     print("Submission checker")
     print()
@@ -279,7 +258,7 @@ def _print_report(report: dict) -> None:
         "file_size": "File size",
         "vocabulary": "Vocabulary",
         "encoding": "Encoding",
-        "decoding": "Decoding",
+        "guardrail": "English/French guardrail",
         "compatibility": "Compatibility",
     }
     for key, label in labels.items():
@@ -293,25 +272,27 @@ def _print_report(report: dict) -> None:
 
     if "score" in report:
         print()
-        print(f"Competition score ({report['rows']:,} rows, lower is better)")
+        print(f"Scores ({report['rows']:,} rows, lower is better)")
+        print(f"{'language':<12}{'tokens/word':>13}{'[UNK] rate':>12}{'score':>9}")
         for language in LANGUAGES:
-            if language not in report["normalized"]:
+            if language not in report["fertility"]:
                 continue
-            print(
-                f"{_leader(LANGUAGE_NAMES[language])} "
-                f"fertility {report['fertility'][language]:.4f}   "
-                f"normalized {report['normalized'][language]:.4f}"
-            )
+            marker = "*" if language in SCORED_LANGUAGES else " "
+            print(f"{LANGUAGE_NAMES[language] + marker:<12}"
+                  f"{report['fertility'][language]:>13.3f}"
+                  f"{report['unknown_rate'][language]:>12.4f}"
+                  f"{report['penalised'][language]:>9.3f}")
         print(f"{_leader('SCORE')} {report['score']:.4f}")
+        print("  * scored languages")
+        if report["lossy_rows"]:
+            print(f"  note: {report['lossy_rows']:,} rows do not round trip exactly")
         print()
         print("Local benchmark (informational only)")
         elapsed = report["elapsed_seconds"]
         readable = f"{elapsed:.2f} s" if elapsed >= 1 else f"{elapsed * 1000:.0f} ms"
         print(f"{_leader('Evaluation time')} {readable}")
-        print(
-            f"{_leader('Throughput')} "
-            f"{report['throughput'] / 1e6:.1f}M characters/sec"
-        )
+        speed = report["throughput"] / 1e6
+        print(f"{_leader('Throughput')} {speed:.1f}M characters/sec")
 
     print()
     print("READY FOR SUBMISSION ✓" if report["valid"] else "NOT READY FOR SUBMISSION")
@@ -323,5 +304,4 @@ if __name__ == "__main__":
     import sys
 
     target = sys.argv[1] if len(sys.argv) > 1 else "tokenizer.json"
-    profiled = profile_submission(target)
-    raise SystemExit(0 if profiled["valid"] else 1)
+    raise SystemExit(0 if profile_submission(target)["valid"] else 1)

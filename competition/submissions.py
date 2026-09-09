@@ -17,7 +17,6 @@ class Metadata:
     members: tuple[str, ...]
     affiliation: str = ""
     approach: str = ""
-    final: bool = False
 
 
 def load_metadata(path: str | Path) -> Metadata:
@@ -47,7 +46,6 @@ def load_metadata(path: str | Path) -> Metadata:
         members=tuple(member.strip() for member in members),
         affiliation=str(payload.get("affiliation", "")).strip()[:120],
         approach=str(payload.get("approach", "")).strip()[:240],
-        final=bool(payload.get("final", False)),
     )
 
 
@@ -57,7 +55,7 @@ def validate_submission_directory(path: str | Path) -> tuple[Metadata, Path]:
         raise ValueError(f"submission directory not found: {path}")
     if not SLUG_PATTERN.fullmatch(path.name):
         raise ValueError("submission folder must be a lowercase kebab-case team slug")
-    allowed = {"tokenizer.json", "metadata.yml", "README.md"}
+    allowed = {"tokenizer.json", "metadata.yml", "notebook.ipynb", "README.md"}
     symlinks = sorted(item.name for item in path.iterdir() if item.is_symlink())
     if symlinks:
         raise ValueError(f"symlinks are not allowed: {', '.join(symlinks)}")

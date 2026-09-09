@@ -1,6 +1,0 @@
-team: Official Baseline
-members:
-  - AMTC Organizers
-affiliation: African Multilingual Tokenizer Challenge
-approach: Byte-level BPE with NFC normalization and balanced multilingual training data.
-final: true

@@ -28,22 +28,18 @@ jobs:
           mkdir -p artifacts
           curl --fail --silent --show-error --location "$PRIVATE_DATA_URL" --output artifacts/private_test.csv
           echo "$PRIVATE_DATA_SHA256  artifacts/private_test.csv" | sha256sum --check --strict
-      - name: Calculate private baseline
-        run: uv run --frozen python scripts/calculate_baseline_stats.py --data artifacts/private_test.csv --output artifacts/private_baseline.json
-      - name: Evaluate selected final submissions
+      - name: Evaluate every submission on the private test split
         run: >-
           uv run --frozen python scripts/update_leaderboard.py
           --data artifacts/private_test.csv
-          --baseline artifacts/private_baseline.json
           --csv artifacts/final_leaderboard.csv
           --markdown artifacts/FINAL_LEADERBOARD.md
           --failures artifacts/final_failures.json
-          --final-only
           --repeats 3
           --strict
       - name: Remove hidden evaluation text
         if: always()
-        run: rm -f artifacts/private_test.csv artifacts/private_baseline.json
+        run: rm -f artifacts/private_test.csv
       - uses: actions/upload-artifact@v4
         with:
           name: final-results

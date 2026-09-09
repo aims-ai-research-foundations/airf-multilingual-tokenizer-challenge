@@ -31,7 +31,9 @@ Your tokenizer must:
 - load with Hugging Face `tokenizers==0.22.1`;
 - have at most 10,000 entries by `get_vocab_size(with_added_tokens=True)`;
 - produce at least one token and a non-empty decode in all six languages;
-- need no external files, network access, or custom code.
+- need no external files, network access, or custom code;
+- be built by your own code from the provided training data, with no
+  pretrained tokenizer, external corpus, or third-party API involved.
 
 ## 3. Add your submission
 
@@ -49,6 +51,7 @@ submissions/
 └── team-tokenlab/
     ├── tokenizer.json     required
     ├── metadata.yml       required
+    ├── notebook.ipynb     required before the deadline
     └── README.md          optional, describe your approach
 ```
 
@@ -61,7 +64,6 @@ members:
   - Participant Two
 affiliation: Optional organization
 approach: Short public description of the tokenizer
-final: false
 ```
 
 One team owns exactly one directory. Nothing else may be added to it: no
@@ -85,9 +87,16 @@ Once the check passes, open a pull request from your `submission` branch. A
 scheduled workflow then scores every accepted submission on the hidden test
 split and updates the leaderboard.
 
-You may keep pushing improvements to the same branch until the freeze time.
-When the deadline is announced, set `final: true` on the one tokenizer you want
-judged.
+You may keep pushing improvements to the same branch until the deadline. Your
+most recent tokenizer is the one that gets judged, so there is nothing to mark
+as final.
+
+Before the deadline, commit the notebook you used to build your tokenizer as
+`notebook.ipynb` in your team directory. A team that does not submit its
+notebook will be disqualified.
+
+If two tokenizers reach the same score, throughput breaks the tie and the
+fastest one wins.
 
 ## Contributing to the tooling
 

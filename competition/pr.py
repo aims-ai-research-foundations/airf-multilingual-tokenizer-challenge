@@ -11,7 +11,7 @@ def submission_slug_from_changes(changed_files: list[str]) -> str:
     if not changed_files:
         raise ValueError("pull request contains no changed files")
     slugs = set()
-    allowed_names = {"tokenizer.json", "metadata.yml", "README.md"}
+    allowed_names = {"tokenizer.json", "metadata.yml", "notebook.ipynb", "README.md"}
     for raw_path in changed_files:
         path = PurePosixPath(raw_path)
         if len(path.parts) != 3 or path.parts[0] != "submissions":

@@ -5,6 +5,7 @@ from pathlib import Path
 
 from tokenizers import Tokenizer, __version__ as tokenizers_version
 
+from .metrics import unknown_token_id
 from .constants import (
     MAX_TOKENIZER_BYTES,
     MAX_VOCAB_SIZE,
@@ -22,6 +23,8 @@ class ValidationReport:
     tokenizers_version: str = tokenizers_version
     checks: dict[str, bool] = field(default_factory=dict)
     errors: list[str] = field(default_factory=list)
+    unknown_tokens: int = 0
+    lossy_languages: list[str] = field(default_factory=list)
     tokenizer: Tokenizer | None = field(default=None, repr=False)
 
     def as_dict(self) -> dict:
@@ -33,6 +36,8 @@ class ValidationReport:
             "tokenizers_version": self.tokenizers_version,
             "checks": self.checks,
             "errors": self.errors,
+            "unknown_tokens": self.unknown_tokens,
+            "lossy_languages": self.lossy_languages,
         }
 
 
@@ -74,10 +79,24 @@ def validate_tokenizer(path: str | Path) -> ValidationReport:
         report.checks["encodes_all_languages"] = all(encoding.ids for encoding in encodings)
         if not report.checks["encodes_all_languages"]:
             report.errors.append("one or more required languages produced no tokens")
+        unknown_id = unknown_token_id(tokenizer)
+        unknown_hits = 0 if unknown_id is None else sum(
+            sum(1 for value in encoding.ids if value == unknown_id)
+            for encoding in encodings
+        )
+        # Unknown tokens are penalised by the score, not rejected here.
+        report.unknown_tokens = unknown_hits
         decoded = [tokenizer.decode(encoding.ids, skip_special_tokens=False) for encoding in encodings]
         report.checks["decodes"] = all(text.strip() for text in decoded)
         if not report.checks["decodes"]:
             report.errors.append("one or more smoke-test encodings could not be decoded")
+        report.lossy_languages = [
+            language
+            for language, original, restored in zip(
+                SMOKE_TEXTS, SMOKE_TEXTS.values(), decoded
+            )
+            if original != restored
+        ]
     except Exception as exc:
         report.checks["encodes_all_languages"] = False
         report.checks["decodes"] = False

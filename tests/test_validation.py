@@ -14,7 +14,7 @@ def save_wordlevel(path: Path, size: int):
 
 def test_baseline_passes():
     root = Path(__file__).resolve().parents[1]
-    report = validate_tokenizer(root / "submissions/baseline/tokenizer.json")
+    report = validate_tokenizer(root / "starter/baselines/character-level/tokenizer.json")
     assert report.valid, report.errors
     assert report.vocab_size <= MAX_VOCAB_SIZE
 
@@ -38,7 +38,7 @@ def test_wrong_filename_fails(tmp_path):
 
 def test_participant_checker_reports_local_benchmark(capsys):
     root = Path(__file__).resolve().parents[1]
-    exit_code = check_main([str(root / "submissions/baseline/tokenizer.json")])
+    exit_code = check_main([str(root / "starter/baselines/character-level/tokenizer.json")])
     output = capsys.readouterr().out
     assert exit_code == 0
     assert "Local benchmark (informational)" in output

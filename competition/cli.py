@@ -35,13 +35,14 @@ def check_main(argv: list[str] | None = None) -> int:
         payload["local_benchmark"] = local_benchmark
         print(json.dumps(payload, indent=2))
     else:
-        print("African Multilingual Tokenizer Challenge\nSubmission Checker\n")
+        print("AI Research Foundations Multilingual Tokenization Challenge\nSubmission Checker\n")
         labels = {
             "loads": "Loading tokenizer",
             "file_size": "File size",
             "vocabulary": "Vocabulary",
             "encodes_all_languages": "Six-language encoding",
             "decodes": "Decoding",
+            "lossless": "Lossless round trip",
             "compatible_version": "Compatibility",
         }
         for key in ("loads", "file_size", "vocabulary", "encodes_all_languages", "decodes", "compatible_version"):
@@ -54,6 +55,11 @@ def check_main(argv: list[str] | None = None) -> int:
             print("\nLocal benchmark (informational)")
             print(f"Evaluation time            {local_benchmark['elapsed_seconds']:.4f} s")
             print(f"Throughput                 {local_benchmark['throughput_chars_per_second']:,.0f} characters/second")
+        if report.unknown_tokens:
+            print(f"\nNote: {report.unknown_tokens} [UNK] token(s) on the smoke text. "
+                  "These are penalised by the score, not rejected.")
+        if report.lossy_languages:
+            print(f"Note: not lossless for {', '.join(report.lossy_languages)}.")
         print("\nREADY FOR SUBMISSION ✓" if report.valid else "\nNOT READY FOR SUBMISSION")
         for error in report.errors:
             print(f"✗ {error}")
@@ -64,10 +70,9 @@ def evaluate_main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Score one AMTC submission")
     parser.add_argument("submission_dir")
     parser.add_argument("--data", default="tests/fixtures/validation.csv")
-    parser.add_argument("--baseline", default="tests/fixtures/baseline_fertility.json")
     parser.add_argument("--repeats", type=int, default=3)
     args = parser.parse_args(argv)
-    result = evaluate_submission(args.submission_dir, args.data, args.baseline, benchmark_repeats=args.repeats)
+    result = evaluate_submission(args.submission_dir, args.data, benchmark_repeats=args.repeats)
     print(json.dumps(result, ensure_ascii=False, indent=2))
     return 0
 
@@ -76,20 +81,16 @@ def leaderboard_main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Evaluate submissions and update AMTC leaderboards")
     parser.add_argument("--submissions", default="submissions")
     parser.add_argument("--data", default="tests/fixtures/demo_public_test.csv")
-    parser.add_argument("--baseline", default="tests/fixtures/baseline_fertility.json")
     parser.add_argument("--csv", default="leaderboard.csv")
     parser.add_argument("--markdown", default="LEADERBOARD.md")
     parser.add_argument("--failures", default="artifacts/evaluation_failures.json")
     parser.add_argument("--repeats", type=int, default=3)
     parser.add_argument("--strict", action="store_true")
-    parser.add_argument("--final-only", action="store_true", help="rank only entries with final: true")
     args = parser.parse_args(argv)
     rows, failures = build_leaderboard(
         args.submissions,
         args.data,
-        args.baseline,
         benchmark_repeats=args.repeats,
-        final_only=args.final_only,
     )
     write_leaderboard(rows, args.csv, args.markdown)
     failures_path = Path(args.failures)
