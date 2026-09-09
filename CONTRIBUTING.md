@@ -48,7 +48,7 @@ Then create one directory for your team, named in lowercase kebab case:
 
 ```text
 submissions/
-└── team-tokenlab/
+└── <team-name>/
     ├── tokenizer.json     required
     ├── metadata.yml       required
     ├── notebook.ipynb     required before the deadline
@@ -58,12 +58,12 @@ submissions/
 `metadata.yml` looks like this:
 
 ```yaml
-team: TokenLab
+team: <Your Team Name>
 members:
-  - Participant One
-  - Participant Two
-affiliation: Optional organization
-approach: Short public description of the tokenizer
+  - <Member One>
+  - <Member Two>
+affiliation: <Optional organization>
+approach: <Short public description of your tokenizer>
 ```
 
 One team owns exactly one directory. Nothing else may be added to it: no
@@ -72,8 +72,8 @@ archives, no symlinks, no model sidecars.
 ## 4. Push the branch, then open a pull request
 
 ```bash
-git add submissions/team-tokenlab
-git commit -m "Add TokenLab submission"
+git add submissions/<team-name>
+git commit -m "<Your commit message>"
 git push origin submission
 ```
 

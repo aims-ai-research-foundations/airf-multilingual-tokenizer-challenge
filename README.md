@@ -16,7 +16,7 @@ The lower your score, the higher you climb on the leaderboard.
 
 | | |
 | --- | --- |
-| **Start here** | [starter/starter.ipynb](starter/starter.ipynb), runs on a free Colab CPU |
+| **Start here** | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/aims-ai-research-foundations/airf-multilingual-tokenizer-challenge/blob/main/starter/starter.ipynb) &nbsp; [starter/starter.ipynb](starter/starter.ipynb), runs on a free Colab CPU |
 | **Current standings** | [LEADERBOARD.md](LEADERBOARD.md), regenerated nightly |
 | **How to submit** | [CONTRIBUTING.md](CONTRIBUTING.md) |
 
@@ -195,7 +195,7 @@ you sample the six languages while training.
 
 ## Making a Submission
 
-1. **Build your tokenizer.** Open [starter/starter.ipynb](starter/starter.ipynb) in Google Colab. It installs everything, loads the data, and trains two baselines you can improve on.
+1. **Build your tokenizer.** [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/aims-ai-research-foundations/airf-multilingual-tokenizer-challenge/blob/main/starter/starter.ipynb) or open [starter/starter.ipynb](starter/starter.ipynb) in Google Colab. It installs everything, loads the data, and trains two baselines you can improve on.
 2. **Export it** as a single file named `tokenizer.json`.
 3. **Check it** by running the submission checker at the end of the notebook. It applies the same rules as official evaluation and shows your fertility, `[UNK]` rate and score for every language.
 4. **Fork this repository** and create a branch named exactly `submission`.
@@ -207,7 +207,7 @@ you sample the six languages while training.
 5. **Add one directory for your team**, named in lowercase kebab case, containing your `tokenizer.json` and a `metadata.yml` naming your team and members. An optional `README.md` can describe your approach.
 
    ```text
-   submissions/team-tokenlab/
+   submissions/<team-name>/
    ├── tokenizer.json
    └── metadata.yml
    ```
@@ -215,8 +215,8 @@ you sample the six languages while training.
 6. **Push the `submission` branch.** The automated check runs on every push to that branch and validates your entry.
 
    ```bash
-   git add submissions/team-tokenlab
-   git commit -m "Add TokenLab submission"
+   git add submissions/<team-name>
+   git commit -m "<Your commit message>"
    git push origin submission
    ```
 
