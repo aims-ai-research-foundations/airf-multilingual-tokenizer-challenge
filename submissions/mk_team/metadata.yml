@@ -1,0 +1,5 @@
+team: mk_team
+members:
+  - Christelle KAMGA MOGOUN
+
+approach: Our tokenizer is based on Byte-Level BPE (Byte-Pair Encoding). It takes text as input and normalizes it to standardize accented characters (such as those used in French and Yoruba). It then applies a mechanism to extract words from the given text. In our case, punctuation marks are treated as independent words, and some words are captured along with the space that precedes them; thus, the same word can have two different representations (with or without a space). What is interesting about this tokenizer is that it does not produce any unknown tokens. This is because letters, symbols, and emojis are first converted into UTF-8 bytes. Since all characters in the world can be broken down using this byte-based system, every symbol always has a possible representation.
