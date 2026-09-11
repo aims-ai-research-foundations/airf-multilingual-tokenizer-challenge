@@ -17,6 +17,7 @@ site-dist/
 /baseline_tokenizer.json
 .amtc_cache/
 /leaderboard.csv
+# leaderboard.json is NOT ignored: the public website reads it.
 
 # Organizer-only material, never published
 organizer-private/

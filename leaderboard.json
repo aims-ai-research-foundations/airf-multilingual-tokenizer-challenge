@@ -1,0 +1,6 @@
+{
+  "generated_at": "2026-09-10T22:32:17+00:00",
+  "metric": "Average tokens per word plus a 100x unknown-token penalty, across Hausa, Swahili, Yoruba and Amharic. Lower is better.",
+  "repository": "aims-ai-research-foundations/airf-multilingual-tokenizer-challenge",
+  "entries": []
+}

@@ -25,7 +25,7 @@ def main() -> int:
     )
     changed = [line for line in completed.stdout.splitlines() if line.strip()]
     result = validate_pr(Path.cwd(), changed)
-    print(f"✓ tokenizer.json found\n✓ Tokenizer loads successfully")
+    print("✓ tokenizer.json found\n✓ Tokenizer loads successfully")
     print(f"✓ Vocabulary: {result['vocab_size']:,} / 10,000")
     print(f"✓ Submission format valid\n\nSUBMISSION ACCEPTED — {result['team']}")
     return 0

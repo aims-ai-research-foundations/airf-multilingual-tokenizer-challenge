@@ -83,6 +83,7 @@ def leaderboard_main(argv: list[str] | None = None) -> int:
     parser.add_argument("--data", default="tests/fixtures/demo_public_test.csv")
     parser.add_argument("--csv", default="leaderboard.csv")
     parser.add_argument("--markdown", default="LEADERBOARD.md")
+    parser.add_argument("--json", dest="json_path", default="leaderboard.json")
     parser.add_argument("--failures", default="artifacts/evaluation_failures.json")
     parser.add_argument("--repeats", type=int, default=3)
     parser.add_argument("--strict", action="store_true")
@@ -92,7 +93,7 @@ def leaderboard_main(argv: list[str] | None = None) -> int:
         args.data,
         benchmark_repeats=args.repeats,
     )
-    write_leaderboard(rows, args.csv, args.markdown)
+    write_leaderboard(rows, args.csv, args.markdown, json_path=args.json_path)
     failures_path = Path(args.failures)
     failures_path.parent.mkdir(parents=True, exist_ok=True)
     failures_path.write_text(json.dumps(failures, indent=2) + "\n", encoding="utf-8")

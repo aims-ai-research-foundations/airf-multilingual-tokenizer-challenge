@@ -17,7 +17,7 @@ The lower your score, the higher you climb on the leaderboard.
 | | |
 | --- | --- |
 | **Start here** | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/aims-ai-research-foundations/airf-multilingual-tokenizer-challenge/blob/main/starter/starter.ipynb) &nbsp; [starter/starter.ipynb](starter/starter.ipynb), runs on a free Colab CPU |
-| **Current standings** | [LEADERBOARD.md](LEADERBOARD.md), regenerated nightly |
+| **Current standings** | [LEADERBOARD.md](LEADERBOARD.md), regenerated nightly, and on the [challenge website](https://airf.aims.ac.za/community/africa-multilingual-tokenizer-challenge/leaderboard/) |
 | **How to submit** | [CONTRIBUTING.md](CONTRIBUTING.md) |
 
 ---
@@ -260,6 +260,7 @@ competition/               the evaluation package used by CI
 scripts/                   training, evaluation and leaderboard commands
 tests/                     the contract tests, including small data fixtures
 LEADERBOARD.md             regenerated nightly
+leaderboard.json           the same standings as a feed, read by the website
 ```
 
 The starter notebook needs nothing from this repository. It installs its own

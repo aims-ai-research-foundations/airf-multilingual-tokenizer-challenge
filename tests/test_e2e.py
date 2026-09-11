@@ -1,7 +1,9 @@
+import json
 from pathlib import Path
 
 from tokenizers import Tokenizer, decoders, models, normalizers, pre_tokenizers, trainers
 
+from competition.constants import LANGUAGES
 from competition.data import load_dataset
 
 from competition.leaderboard import build_leaderboard, write_leaderboard
@@ -53,6 +55,23 @@ def test_submission_to_all_leaderboard_formats(tmp_path):
 
     csv_path = tmp_path / "leaderboard.csv"
     markdown_path = tmp_path / "LEADERBOARD.md"
-    write_leaderboard(rows, csv_path, markdown_path)
+    json_path = tmp_path / "leaderboard.json"
+    write_leaderboard(rows, csv_path, markdown_path, json_path=json_path)
     assert "Test Team" in csv_path.read_text(encoding="utf-8")
     assert "Test Team" in markdown_path.read_text(encoding="utf-8")
+
+    # The JSON feed is a published contract: the website reads these keys.
+    feed = json.loads(json_path.read_text(encoding="utf-8"))
+    assert set(feed) == {"generated_at", "metric", "repository", "entries"}
+    assert len(feed["entries"]) == len(rows)
+    ranked = [entry for entry in feed["entries"] if entry["status"] == "ranked"]
+    assert [entry["team"] for entry in ranked] == ["Test Team"]
+    entry = ranked[0]
+    assert set(entry) == {
+        "rank", "team", "slug", "status", "score", "fertility", "unknown_rate",
+        "speed_chars_per_second", "vocab_size", "evaluated_at",
+        "fertility_by_language",
+    }
+    assert entry["rank"] == 1
+    assert entry["score"] > 0
+    assert set(entry["fertility_by_language"]) == set(LANGUAGES)
