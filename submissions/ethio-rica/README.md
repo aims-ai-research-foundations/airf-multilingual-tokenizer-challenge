@@ -17,11 +17,4 @@ languages oversampled (ha/sw/yo ×2, am ×3).
 | + NFD + strip accents | 1.5595 |
 | + Geʽez vowel-order collapse (all orders → 6th order) | 1.4408 |
 
-**What is lost.** The tokenizer is deliberately lossy: case, punctuation,
-digit values, Latin diacritics (including Yoruba tone and underdot marks)
-and Amharic vowel orders are not recoverable from the tokens. The
-competition permits imperfect decode; every step above is a standard
-normalization used in NLP for the respective script.
 
-Things that did not help: Metaspace / attached punctuation, tokens spanning
-words, Unigram, and heavier reweighting toward Amharic.
