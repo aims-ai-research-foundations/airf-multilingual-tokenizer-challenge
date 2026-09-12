@@ -25,4 +25,3 @@ normalization used in NLP for the respective script.
 
 Things that did not help: Metaspace / attached punctuation, tokens spanning
 words, Unigram, and heavier reweighting toward Amharic.
-
