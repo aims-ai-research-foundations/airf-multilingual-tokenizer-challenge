@@ -1,5 +1,0 @@
-team: EthioRica
-members:
-  - Yohannes Mengistie
-affiliation: Addis Ababa, Ethiopia
-approach: Byte-fallback BPE (10k vocab) with lossy normalization - lowercase, punctuation and digit collapsing, accent stripping, Ge'ez homophone merging and vowel-order collapse; scored languages oversampled during training.
