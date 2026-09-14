@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-13T06:12:18+00:00",
+  "generated_at": "2026-09-14T06:22:11+00:00",
   "metric": "Average tokens per word plus a 100x unknown-token penalty, across Hausa, Swahili, Yoruba and Amharic, plus any amount by which English or French exceeds 1.15 times that average, plus 3x the share of rows the tokenizer fails to reconstruct exactly. Lower is better.",
   "repository": "aims-ai-research-foundations/airf-multilingual-tokenizer-challenge",
   "entries": [
@@ -8,21 +8,21 @@
       "team": "mk_team",
       "slug": "mk_team",
       "status": "ranked",
-      "score": 2.084,
-      "fertility": 2.084,
+      "score": 2.1688,
+      "fertility": 2.1688,
       "unknown_rate": 0.0,
       "guardrail_penalty": 0.0,
       "reconstruction": 1.0,
-      "speed_chars_per_second": 4020635,
+      "speed_chars_per_second": 3799845,
       "vocab_size": 10000,
-      "evaluated_at": "2026-09-13T06:12:02+00:00",
+      "evaluated_at": "2026-09-14T06:22:11+00:00",
       "fertility_by_language": {
-        "en": 1.9188,
-        "fr": 2.0235,
-        "ha": 1.7296,
-        "sw": 1.9173,
-        "yo": 2.103,
-        "am": 2.5859
+        "en": 1.6522,
+        "fr": 1.7826,
+        "ha": 1.6774,
+        "sw": 2.2,
+        "yo": 1.9091,
+        "am": 2.8889
       }
     },
     {
@@ -30,21 +30,21 @@
       "team": "ethio-rica",
       "slug": "ethio-rica",
       "status": "ranked",
-      "score": 4.4426,
-      "fertility": 1.4347,
+      "score": 4.5532,
+      "fertility": 1.5295,
       "unknown_rate": 0.0,
-      "guardrail_penalty": 0.0079,
+      "guardrail_penalty": 0.0237,
       "reconstruction": 0.0,
-      "speed_chars_per_second": 1581345,
+      "speed_chars_per_second": 839573,
       "vocab_size": 10000,
-      "evaluated_at": "2026-09-13T06:12:02+00:00",
+      "evaluated_at": "2026-09-14T06:22:11+00:00",
       "fertility_by_language": {
-        "en": 1.6081,
-        "fr": 1.6578,
-        "ha": 1.343,
-        "sw": 1.4855,
-        "yo": 1.3495,
-        "am": 1.5608
+        "en": 1.4783,
+        "fr": 1.7826,
+        "ha": 1.3548,
+        "sw": 1.95,
+        "yo": 1.0909,
+        "am": 1.7222
       }
     }
   ]
