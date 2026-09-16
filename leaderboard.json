@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-15T06:11:36+00:00",
+  "generated_at": "2026-09-16T06:05:16+00:00",
   "metric": "Average tokens per word plus a 100x unknown-token penalty, across Hausa, Swahili, Yoruba and Amharic, plus any amount by which English or French exceeds 1.15 times that average, plus 3x the share of rows the tokenizer fails to reconstruct exactly. Lower is better.",
   "repository": "aims-ai-research-foundations/airf-multilingual-tokenizer-challenge",
   "entries": [
@@ -13,9 +13,9 @@
       "unknown_rate": 0.0,
       "guardrail_penalty": 0.0,
       "reconstruction": 1.0,
-      "speed_chars_per_second": 3569889,
+      "speed_chars_per_second": 5023716,
       "vocab_size": 10000,
-      "evaluated_at": "2026-09-15T06:11:36+00:00",
+      "evaluated_at": "2026-09-16T06:05:16+00:00",
       "fertility_by_language": {
         "en": 1.6522,
         "fr": 1.7826,
@@ -35,9 +35,9 @@
       "unknown_rate": 0.0,
       "guardrail_penalty": 0.0237,
       "reconstruction": 0.0,
-      "speed_chars_per_second": 1222592,
+      "speed_chars_per_second": 1223384,
       "vocab_size": 10000,
-      "evaluated_at": "2026-09-15T06:11:36+00:00",
+      "evaluated_at": "2026-09-16T06:05:16+00:00",
       "fertility_by_language": {
         "en": 1.4783,
         "fr": 1.7826,
