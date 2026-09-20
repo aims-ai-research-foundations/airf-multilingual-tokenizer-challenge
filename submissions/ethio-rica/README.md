@@ -55,26 +55,7 @@ Why these values:
 - English and French are not scored. They only need to stay under the
   guardrail (1.15 × the score), so they get just enough weight for that.
 
-## Results
 
-Validation split (24,000 rows, 4,000 per language), measured with the official
-scoring helper in `notebook.ipynb`:
-
-| | ha | sw | yo | am | en | fr |
-|---|---|---|---|---|---|---|
-| tokens per word | 1.682 | 1.763 | 1.863 | 2.373 | 2.082 | 2.179 |
-
-| | value |
-|---|---|
-| Score (mean of ha, sw, yo, am) | **1.9202** |
-| Guardrail budget (1.15 × score) | 2.208 |
-| Guardrail penalty | 0 (en 5.7% under budget, fr 1.3% under) |
-| `[UNK]` rate | 0 in all six languages |
-| Reconstruction | 100% |
-| Vocabulary | 10,000 |
-
-Nightly leaderboard of 2026-09-20 (hidden set): **1.9271**
-(ha 1.656, sw 1.751, yo 1.886, am 2.415, en 2.108, fr 2.204).
 
 ## Reproducing
 
@@ -94,9 +75,3 @@ merges.
 - The method is purely frequency-based and uses no linguistic knowledge of the
   languages.
 
-## Acknowledgement
-
-The final language weights were chosen after reading the public notes of team
-`maick-dane-nkou` in this repository, which report that Swahili-heavy
-weighting suits this metric. We confirmed the effect on the validation split
-(1.9318 → 1.9202) before adopting it.
