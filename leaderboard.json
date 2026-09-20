@@ -1,10 +1,32 @@
 {
-  "generated_at": "2026-09-19T05:55:03+00:00",
+  "generated_at": "2026-09-20T06:19:01+00:00",
   "metric": "Average tokens per word plus a 100x unknown-token penalty, across Hausa, Swahili, Yoruba and Amharic, plus any amount by which English or French exceeds 1.15 times that average, plus 3x the share of rows the tokenizer fails to reconstruct exactly. Lower is better.",
   "repository": "aims-ai-research-foundations/airf-multilingual-tokenizer-challenge",
   "entries": [
     {
       "rank": 1,
+      "team": "ethio-rica",
+      "slug": "ethio-rica",
+      "status": "ranked",
+      "score": 1.9271,
+      "fertility": 1.9271,
+      "unknown_rate": 0.0,
+      "guardrail_penalty": 0.0,
+      "reconstruction": 1.0,
+      "speed_chars_per_second": 6343352,
+      "vocab_size": 10000,
+      "evaluated_at": "2026-09-20T06:18:45+00:00",
+      "fertility_by_language": {
+        "en": 2.1081,
+        "fr": 2.2037,
+        "ha": 1.6556,
+        "sw": 1.7508,
+        "yo": 1.8864,
+        "am": 2.4154
+      }
+    },
+    {
+      "rank": 2,
       "team": "Maick Dane Nkou",
       "slug": "maick-dane-nkou",
       "status": "ranked",
@@ -13,9 +35,9 @@
       "unknown_rate": 0.0,
       "guardrail_penalty": 0.0,
       "reconstruction": 1.0,
-      "speed_chars_per_second": 8927242,
+      "speed_chars_per_second": 7240179,
       "vocab_size": 10000,
-      "evaluated_at": "2026-09-19T05:54:52+00:00",
+      "evaluated_at": "2026-09-20T06:18:45+00:00",
       "fertility_by_language": {
         "en": 2.1072,
         "fr": 2.1985,
@@ -26,29 +48,29 @@
       }
     },
     {
-      "rank": 2,
+      "rank": 3,
       "team": "Dekel DataSphere",
       "slug": "Dekel_datasphere",
       "status": "ranked",
-      "score": 1.9317,
-      "fertility": 1.9317,
+      "score": 1.9323,
+      "fertility": 1.9247,
       "unknown_rate": 0.0,
-      "guardrail_penalty": 0.0,
+      "guardrail_penalty": 0.0076,
       "reconstruction": 1.0,
-      "speed_chars_per_second": 7408813,
+      "speed_chars_per_second": 5822039,
       "vocab_size": 10000,
-      "evaluated_at": "2026-09-19T05:54:52+00:00",
+      "evaluated_at": "2026-09-20T06:18:45+00:00",
       "fertility_by_language": {
-        "en": 2.0807,
-        "fr": 2.1249,
-        "ha": 1.5935,
-        "sw": 1.8629,
-        "yo": 1.9053,
-        "am": 2.3652
+        "en": 2.0871,
+        "fr": 2.221,
+        "ha": 1.5949,
+        "sw": 1.8633,
+        "yo": 1.909,
+        "am": 2.3316
       }
     },
     {
-      "rank": 3,
+      "rank": 4,
       "team": "mk_team",
       "slug": "mk_team",
       "status": "ranked",
@@ -57,9 +79,9 @@
       "unknown_rate": 0.0,
       "guardrail_penalty": 0.0,
       "reconstruction": 1.0,
-      "speed_chars_per_second": 8027886,
+      "speed_chars_per_second": 6417204,
       "vocab_size": 10000,
-      "evaluated_at": "2026-09-19T05:54:52+00:00",
+      "evaluated_at": "2026-09-20T06:18:45+00:00",
       "fertility_by_language": {
         "en": 2.0078,
         "fr": 2.0893,
@@ -70,25 +92,25 @@
       }
     },
     {
-      "rank": 4,
-      "team": "ethio-rica",
-      "slug": "ethio-rica",
+      "rank": 5,
+      "team": "epic",
+      "slug": "epic",
       "status": "ranked",
-      "score": 1.9383,
-      "fertility": 1.9383,
-      "unknown_rate": 0.0,
+      "score": 2.1676,
+      "fertility": 2.0954,
+      "unknown_rate": 0.000603,
       "guardrail_penalty": 0.0,
-      "reconstruction": 1.0,
-      "speed_chars_per_second": 7936119,
+      "reconstruction": 0.996,
+      "speed_chars_per_second": 7715735,
       "vocab_size": 10000,
-      "evaluated_at": "2026-09-19T05:54:52+00:00",
+      "evaluated_at": "2026-09-20T06:18:45+00:00",
       "fertility_by_language": {
-        "en": 2.0277,
-        "fr": 2.1442,
-        "ha": 1.6407,
-        "sw": 1.8548,
-        "yo": 1.9011,
-        "am": 2.3568
+        "en": 1.9627,
+        "fr": 2.0102,
+        "ha": 1.7446,
+        "sw": 1.9709,
+        "yo": 1.9822,
+        "am": 2.6841
       }
     }
   ]
