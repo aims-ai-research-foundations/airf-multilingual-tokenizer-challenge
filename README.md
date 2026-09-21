@@ -65,7 +65,7 @@ Your submission must:
 
 You may use the Hugging Face [`tokenizers`](https://github.com/huggingface/tokenizers) library and any tokenizer algorithm you can implement or configure yourself.
 
-**You must also submit the notebook used to build your tokenizer. Failure to submit it results in disqualification.**
+**You must also submit the notebook used to build your tokenizer before the deadline. Failure to submit it results in disqualification.**
 
 ## Evaluation
 

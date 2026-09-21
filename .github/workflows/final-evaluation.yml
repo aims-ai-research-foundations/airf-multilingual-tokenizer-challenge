@@ -18,16 +18,21 @@ jobs:
         with:
           enable-cache: true
       - run: uv sync --frozen --dev
-      - name: Download private test set
+      - name: Download private test split
         env:
-          PRIVATE_DATA_URL: ${{ secrets.PRIVATE_EVALUATION_DATA_URL }}
-          PRIVATE_DATA_SHA256: ${{ secrets.PRIVATE_EVALUATION_DATA_SHA256 }}
+          HIDDEN_DATASET_ID: ${{ secrets.HIDDEN_DATASET_ID }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          test -n "$PRIVATE_DATA_URL"
-          test -n "$PRIVATE_DATA_SHA256"
+          # Same private dataset and credentials as the nightly leaderboard, so
+          # there is only one secret to keep working. The final run reads
+          # private_test.csv instead of public_test.csv.
+          test -n "$HIDDEN_DATASET_ID"
+          test -n "$HF_TOKEN"
           mkdir -p artifacts
-          curl --fail --silent --show-error --location "$PRIVATE_DATA_URL" --output artifacts/private_test.csv
-          echo "$PRIVATE_DATA_SHA256  artifacts/private_test.csv" | sha256sum --check --strict
+          uv run --frozen --group data python scripts/download_hidden_data.py \
+            --repo-id "$HIDDEN_DATASET_ID" \
+            --file private_test.csv \
+            --output artifacts/private_test.csv
       - name: Evaluate every submission on the private test split
         run: >-
           uv run --frozen python scripts/update_leaderboard.py
