@@ -1,0 +1,6 @@
+team: Malagasy
+members:
+  - ANDRIAMAMY Rova Isaia
+affiliation: University of Antananarivo, Antananarivo Madagascar
+languages: ["en", "fr", "ha", "sw", "yo", "am"]
+approach: "2-stage BPE, superword pre-tokenizer, weighted corpus (en=0.9, fr=2.2, ha=5.5, sw=5.5, yo=4.5, am=6.5), transition ratio 0.70"
