@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-23T09:08:08+00:00",
+  "generated_at": "2026-11-24T10:56:59+00:00",
   "metric": "Average tokens per word plus a 100x unknown-token penalty, across Hausa, Swahili, Yoruba and Amharic, plus any amount by which English or French exceeds 1.15 times that average, plus 3x the share of rows the tokenizer fails to reconstruct exactly. Lower is better.",
   "repository": "aims-ai-research-foundations/airf-multilingual-tokenizer-challenge",
   "entries": [
@@ -13,9 +13,9 @@
       "unknown_rate": 0.0,
       "guardrail_penalty": 0.0,
       "reconstruction": 1.0,
-      "speed_chars_per_second": 10096705,
+      "speed_chars_per_second": 6910320,
       "vocab_size": 10000,
-      "evaluated_at": "2026-11-23T09:07:54+00:00",
+      "evaluated_at": "2026-11-24T10:56:41+00:00",
       "fertility_by_language": {
         "en": 2.1186,
         "fr": 2.1052,
@@ -35,9 +35,9 @@
       "unknown_rate": 0.0,
       "guardrail_penalty": 0.0,
       "reconstruction": 1.0,
-      "speed_chars_per_second": 9440084,
+      "speed_chars_per_second": 7110783,
       "vocab_size": 10000,
-      "evaluated_at": "2026-11-23T09:07:54+00:00",
+      "evaluated_at": "2026-11-24T10:56:41+00:00",
       "fertility_by_language": {
         "en": 2.085,
         "fr": 2.0438,
@@ -57,9 +57,9 @@
       "unknown_rate": 0.0,
       "guardrail_penalty": 0.0,
       "reconstruction": 1.0,
-      "speed_chars_per_second": 8238619,
+      "speed_chars_per_second": 6570759,
       "vocab_size": 10000,
-      "evaluated_at": "2026-11-23T09:07:54+00:00",
+      "evaluated_at": "2026-11-24T10:56:41+00:00",
       "fertility_by_language": {
         "en": 2.1081,
         "fr": 2.2037,
@@ -79,9 +79,9 @@
       "unknown_rate": 0.0,
       "guardrail_penalty": 0.0,
       "reconstruction": 1.0,
-      "speed_chars_per_second": 9741809,
+      "speed_chars_per_second": 7665745,
       "vocab_size": 10000,
-      "evaluated_at": "2026-11-23T09:07:54+00:00",
+      "evaluated_at": "2026-11-24T10:56:41+00:00",
       "fertility_by_language": {
         "en": 2.1072,
         "fr": 2.1985,
@@ -101,9 +101,9 @@
       "unknown_rate": 0.0,
       "guardrail_penalty": 0.0,
       "reconstruction": 1.0,
-      "speed_chars_per_second": 8685143,
+      "speed_chars_per_second": 6643082,
       "vocab_size": 10000,
-      "evaluated_at": "2026-11-23T09:07:54+00:00",
+      "evaluated_at": "2026-11-24T10:56:41+00:00",
       "fertility_by_language": {
         "en": 2.0078,
         "fr": 2.0893,
@@ -123,9 +123,9 @@
       "unknown_rate": 0.000603,
       "guardrail_penalty": 0.0,
       "reconstruction": 0.996,
-      "speed_chars_per_second": 8620215,
+      "speed_chars_per_second": 8123980,
       "vocab_size": 10000,
-      "evaluated_at": "2026-11-23T09:07:54+00:00",
+      "evaluated_at": "2026-11-24T10:56:41+00:00",
       "fertility_by_language": {
         "en": 1.9627,
         "fr": 2.0102,
